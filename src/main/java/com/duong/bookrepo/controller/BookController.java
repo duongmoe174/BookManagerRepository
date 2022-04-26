@@ -2,6 +2,7 @@ package com.duong.bookrepo.controller;
 
 import com.duong.bookrepo.model.Book;
 import com.duong.bookrepo.model.BookForm;
+import com.duong.bookrepo.model.BookValidator;
 import com.duong.bookrepo.model.Category;
 import com.duong.bookrepo.service.book.IBookService;
 import com.duong.bookrepo.service.category.ICategoryService;
@@ -9,16 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
 @Controller
 public class BookController {
+    BookValidator bookValidator;
     @Value("${file-upload}")
     private String fileUpload;
     @Autowired
@@ -40,31 +44,38 @@ public class BookController {
     }
 
     @PostMapping("/create-book")
-    public ModelAndView createNewBook(@ModelAttribute("book") BookForm bookForm) {
-        //lấy file ảnh:
-        MultipartFile file = bookForm.getImage();
-        //lấy tên file:
-        String fileName = file.getOriginalFilename();
-        //lấy thông tin của book:
-        String name = bookForm.getName();
-        String author = bookForm.getAuthor();
-        int price = bookForm.getPrice();
-        Category category = bookForm.getCategory();
+    public ModelAndView createNewBook(@Valid @ModelAttribute("book") BookForm bookForm, BindingResult result) throws IOException {
+        bookValidator.validate(bookForm, result);
+        if(result.hasErrors()) {
+            ModelAndView modelAndView = new ModelAndView("book/create");
+            return modelAndView;
+        } else {
+            //lấy file ảnh:
+            MultipartFile file = bookForm.getImage();
+            //lấy tên file:
+            String fileName = file.getOriginalFilename();
+            //lấy thông tin của book:
+            String name = bookForm.getName();
+            String author = bookForm.getAuthor();
+            int price = bookForm.getPrice();
+            Category category = bookForm.getCategory();
 
-        Book book = new Book(name, price, author, category, fileName);
+            Book book = new Book(name, price, author, category, fileName);
 
-        try {
-            FileCopyUtils.copy(file.getBytes(), new File(fileUpload + fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                FileCopyUtils.copy(file.getBytes(), new File(fileUpload + fileName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            bookService.save(book);
+            ModelAndView modelAndView = new ModelAndView("book/create");
+            modelAndView.addObject("book", book);
+            modelAndView.addObject("message", "new book created!");
+            return modelAndView;
         }
 
-
-        bookService.save(book);
-        ModelAndView modelAndView = new ModelAndView("book/create");
-        modelAndView.addObject("book", book);
-        modelAndView.addObject("message", "new book created!");
-        return modelAndView;
     }
 
     @GetMapping("/books")
