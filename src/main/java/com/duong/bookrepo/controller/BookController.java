@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -71,11 +68,20 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public ModelAndView listBook() {
-        Iterable<Book> books = bookService.findAll();
-        ModelAndView modelAndView = new ModelAndView("book/list");
-        modelAndView.addObject("books", books);
-        return modelAndView;
+    public ModelAndView listBook(@RequestParam("search") Optional<String> search ){
+        Iterable<Book> books;
+                if(search.isPresent()) {
+                    books = bookService.findBooksByName(search.get());
+                    ModelAndView modelAndView = new ModelAndView("book/list");
+                    modelAndView.addObject("books", books);
+                    return modelAndView;
+                }
+                else {
+                    books = bookService.findAll();
+                    ModelAndView modelAndView = new ModelAndView("book/list");
+                    modelAndView.addObject("books", books);
+                    return modelAndView;
+                }
     }
 
     @GetMapping("/edit-book/{id}")

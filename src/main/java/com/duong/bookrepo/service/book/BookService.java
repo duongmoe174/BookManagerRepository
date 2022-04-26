@@ -31,4 +31,9 @@ public class BookService implements IBookService {
     public void remove(Long id) {
         bookRepository.deleteById(id);
     }
+
+    @Override
+    public Iterable<Book> findBooksByName(String name) {
+        return bookRepository.findBooksByName(name);
+    }
 }

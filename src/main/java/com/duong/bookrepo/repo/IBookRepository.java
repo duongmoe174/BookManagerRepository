@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IBookRepository extends PagingAndSortingRepository<Book, Long> {
+    Iterable<Book> findBooksByName(String name);
 }

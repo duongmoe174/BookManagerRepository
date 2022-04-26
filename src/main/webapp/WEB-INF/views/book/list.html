@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>BookList</title>
-</head>
+<head th:replace="/book/layout :: head"></head>
 <body>
 <a href="/create-book">Create new book</a>
+<form>
+    <div>
+        Search by name:
+    </div>
+    <input name="search" type="text"/>
+    <input type="submit" value="Search"/>
+</form>
 <h1>Book</h1>
-<table>
+<table class="table">
     <tr>
         <th>Name</th>
         <th>Author</th>

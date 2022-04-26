@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Create book</title>
+<head th:replace="/book/layout :: head">
+
 </head>
 <body>
 <h1>New Book</h1>
@@ -13,7 +12,7 @@
     <p th:text="${message}"></p>
 </th:block>
 <form th:action="@{/create-book}" th:object="${book}" method="post" enctype="multipart/form-data">
-    <table>
+    <table class="table">
         <tr>
             <td>Name</td>
             <td><input type="text" th:field="*{name}"></td>
