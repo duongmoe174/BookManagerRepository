@@ -1,8 +1,12 @@
 package com.duong.bookrepo.model;
 
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
-
-public class BookForm {
+@Component
+public class BookForm implements Validator {
     private Long id;
     private String name;
     private String author;
@@ -94,4 +98,19 @@ public class BookForm {
         this.category = category;
     }
 
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return BookForm.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        BookForm bookForm = (BookForm) target;
+        String price = String.valueOf(bookForm.getPrice());
+        ValidationUtils.rejectIfEmpty(errors, "price", "price.empty");
+        if(!price.matches("(^$|[0-9]*$)")) {
+            errors.rejectValue("price", "price.matches");
+        }
+
+    }
 }
